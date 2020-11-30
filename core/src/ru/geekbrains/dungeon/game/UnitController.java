@@ -73,7 +73,7 @@ public class UnitController {
         hero.update(dt);
         monsterController.update(dt);
 
-        if (!currentUnit.isActive() || currentUnit.getTurns() == 0) {
+        if (!currentUnit.isActive() || (currentUnit.getTurns() <= 0 || currentUnit.getAttackNom()<=0)) {
             nextTurn();
         }
     }
