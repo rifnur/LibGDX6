@@ -25,7 +25,7 @@ public abstract class Unit implements Poolable {
     float movementTime;
     float movementMaxTime;
     int targetX, targetY;
-    int turns, maxTurns;
+    int turns, maxTurns, maxAttack,attackNom;
     float innerTimer;
     StringBuilder stringHelper;
 
@@ -39,7 +39,8 @@ public abstract class Unit implements Poolable {
         this.targetY = cellY;
         this.damage = 2;
         this.defence = 0;
-        this.maxTurns = GameController.TURNS_COUNT;
+        this.maxTurns = MathUtils.random(1, 4);
+        this.maxAttack = MathUtils.random(1, 4);
         this.movementMaxTime = 0.2f;
         this.attackRange = 2;
         this.innerTimer = MathUtils.random(1000.0f);
@@ -60,6 +61,7 @@ public abstract class Unit implements Poolable {
 
     public void startTurn() {
         turns = maxTurns;
+        attackNom = maxAttack;
     }
 
     public void startRound() {
@@ -81,7 +83,7 @@ public abstract class Unit implements Poolable {
     }
 
     public boolean canIMakeAction() {
-        return gc.getUnitController().isItMyTurn(this) && turns > 0 && isStayStill();
+        return gc.getUnitController().isItMyTurn(this) && turns > 0 && isStayStill() && attackNom>0;
     }
 
     public boolean isStayStill() {
@@ -99,14 +101,15 @@ public abstract class Unit implements Poolable {
     }
 
     public boolean canIAttackThisTarget(Unit target) {
-        return cellX - target.getCellX() == 0 && Math.abs(cellY - target.getCellY()) <= attackRange ||
-                cellY - target.getCellY() == 0 && Math.abs(cellX - target.getCellX()) <= attackRange;
+        return (cellX - target.getCellX() == 0 && Math.abs(cellY - target.getCellY()) <= attackRange ||
+                cellY - target.getCellY() == 0 && Math.abs(cellX - target.getCellX()) <= attackRange) && attackNom>0;
     }
 
     public void attack(Unit target) {
         target.takeDamage(this, BattleCalc.attack(this, target));
         this.takeDamage(target, BattleCalc.checkCounterAttack(this, target));
         turns--;
+        attackNom--;
     }
 
     public void update(float dt) {
@@ -118,6 +121,7 @@ public abstract class Unit implements Poolable {
                 cellX = targetX;
                 cellY = targetY;
                 turns--;
+
             }
         }
     }
@@ -147,6 +151,14 @@ public abstract class Unit implements Poolable {
         stringHelper.append(hp);
         font18.setColor(1.0f, 1.0f, 1.0f, hpAlpha);
         font18.draw(batch, stringHelper, barX, barY + 64, 60, 1, false);
+
+        if (gc.getUnitController().isItMyTurn(this)) {
+            stringHelper.setLength(0);
+            stringHelper
+                    .append("MP: ").append(turns).append(" ")
+                    .append("AP: ").append(attackNom).append("\n");
+            font18.draw(batch, stringHelper, barX, barY + 88, 60, 1, false);
+        }
 
         font18.setColor(1.0f, 1.0f, 1.0f, 1.0f);
         batch.setColor(1.0f, 1.0f, 1.0f, 1.0f);

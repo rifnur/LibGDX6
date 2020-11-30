@@ -43,10 +43,17 @@ public class Monster extends Unit {
     public void think(float dt) {
         if (canIAttackThisTarget(target)) {
             attack(target);
+            if (attackNom==0){
+                turns=0;
+            }
             return;
+        }
+        if (turns==0){
+            attackNom=0;
         }
         if (amIBlocked()) {
             turns = 0;
+            attackNom=0;
             return;
         }
         if (Utils.getCellsIntDistance(cellX, cellY, target.getCellX(), target.getCellY()) < 5) {

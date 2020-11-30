@@ -1,6 +1,7 @@
 package ru.geekbrains.dungeon.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import lombok.Data;
@@ -29,6 +30,9 @@ public class Hero extends Unit {
             } else {
                 goTo(gc.getCursorX(), gc.getCursorY());
             }
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && isStayStill()) {
+            attackNom=0;
         }
     }
 
